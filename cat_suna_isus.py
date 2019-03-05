@@ -12,7 +12,6 @@ import argparse
 parser = argparse.ArgumentParser(description='Concatinate many SUNA output files into one')
 parser.add_argument('infiles', 
     metavar='infiles', 
-    nargs='*',
     help='input files, can use wildcards ie *.CSV')
 parser.add_argument('-m', '--mooring', nargs=1, 
                     help='add mooring name')
