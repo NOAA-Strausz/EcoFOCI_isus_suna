@@ -12,16 +12,16 @@ import argparse
 parser = argparse.ArgumentParser(description='Concatinate many SUNA output files into one')
 parser.add_argument('infiles', 
     metavar='infiles', 
-    nargs='*',
+    nargs='+',
     help='input files, can use wildcards ie *.CSV')
-parser.add_argument('-m', '--mooring', nargs=1, 
+parser.add_argument('-m', '--mooring', nargs='+', required=True,
                     help='add mooring name')
-parser.add_argument('-sn', '--serial_number', nargs=1,
+parser.add_argument('-sn', '--serial_number', nargs='+', required=True,
                     help='add SUNA serial number')
 args=parser.parse_args()
 
 if args.mooring and args.serial_number:
-    filename=args.mooring[0]+'_'+'suna'+'_'+args.serial_number[0]+'.csv'
+    filename=args.mooring+'_'+'suna'+'_'+args.serial_number+'.csv'
     f = open(filename, 'w')
     
     for line in fileinput.input(args.infiles):
@@ -38,26 +38,9 @@ if args.mooring and args.serial_number:
             time_formatted = time_datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
             f.write(prefix+','+time_formatted+','+the_rest)
     f.close()
+
         
-        
-#    split_line = line.split(',')
-#    day_year = re.match('(\d{4})(\d{3})', split_line[1])
-#    hours = split_line[2]
-#    nitrate = split_line[3]
-#    t_lamp = split_line[10]
-#    day = day_year.group(2)
-#    year = day_year.group(1)
-#    hour_minutes = re.match('(\d{1,2})(\.\d+)', hours)
-#    hour = hour_minutes.group(1)
-#    minutes = int(float(hour_minutes.group(2)) * 60)
-#    seconds = int(((float(hour_minutes.group(2)) * 60) % 1) * 60)
-#    
-#    time_format = "%s %s %s %s %s" %(year, day, hour, minutes, seconds)
-#    time_datetime = datetime.datetime.strptime(time_format, "%Y %j %H %M %S")
-#    date.append(time_datetime)
-#    no3.append(nitrate)
-#    temp.append(t_lamp)
-# 
+
 
     
 
