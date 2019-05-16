@@ -16,6 +16,10 @@ parser.add_argument('-m', '--mooring', nargs='?', required=True,
                     help='add mooring name')
 parser.add_argument('-sn', '--serial_number', nargs='?', required=True,
                     help='add SUNA serial number')
+parser.add_argument('-l', '--leave_dark', action="store_true",
+                    help='Leave dark frames')
+parser.add_argument('-d', '--dark', action="store_true",
+                    help='Only get dark frames')
 args=parser.parse_args()
 
 if args.mooring and args.serial_number:

@@ -24,6 +24,11 @@ parser.add_argument('-spec', '--spectra', action="store_true",
                     help='Make spectra plot of data')
 parser.add_argument('-no3', '--nitrate', action="store_true",
                     help='Plot the nitrate concentration')
+parser.add_argument('-anc', '--ancillary', action="store_true",
+                    help='Plot the ancillary data')
+parser.add_argument('-av', '--average', action="store_true",
+                    help='Create a new csv file from input that averages the hourly readings')
+
 args=parser.parse_args()
 
 
@@ -34,6 +39,11 @@ data.set_index(data[1], inplace=True)
 filename_prefix = args.mooring + '_SUNA_' + args.serial_number
 
 #for nitrate plot
+if args.ancillary:
+    ancillary = data[data.columns[267:276]]
+    names = ['int_temp', 'spec_temp', 'lamp_temp', 'lamp_time', 'rh', 'v_main', 'lamp_v', 'int_v', 'main_I']
+    ancillary.columns = names
+    
 if args.nitrate:
     nitrate=data[data.columns[2]]
     #average 10 nitrate samples to once an hour:
@@ -71,7 +81,11 @@ if args.spectra:
     #note that spectra is transposed, converting everying to regular numpy arrays 
     #might speed it up, but this works
 
-
+if args.average:
+    hourly = data.resample('H').mean()
+    outfile = filename_prefix + "_hourly.csv"
+    hourly.to_csv(outfile)
+        
 
 #make heatmap with seaborn
 #ax = sns.heatmap(spectra)
