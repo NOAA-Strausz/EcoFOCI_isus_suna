@@ -26,6 +26,8 @@ parser.add_argument('-no3', '--nitrate', action="store_true",
                     help='Plot the nitrate concentration')
 parser.add_argument('-anc', '--ancillary', action="store_true",
                     help='Plot the ancillary data')
+parser.add_argument('-an', '--analysis', action="store_true",
+                    help='Plot analysis data')
 parser.add_argument('-av', '--average', action="store_true",
                     help='Create a new csv file from input that averages the hourly readings')
 
@@ -85,6 +87,70 @@ if args.average:
     hourly = data.resample('H').mean()
     outfile = filename_prefix + "_hourly.csv"
     hourly.to_csv(outfile)
+
+if args.analysis:
+    def make_patch_spines_invisible(ax):
+        ax.set_frame_on(True)
+        ax.patch.set_visible(False)
+        for sp in ax.spines.values():
+            sp.set_visible(False)
+    #setup multiple plots taken from
+    #https://matplotlib.org/gallery/ticks_and_spines/multiple_yaxis_with_spines.html
+    fig, host=plt.subplots()
+    fig.subplots_adjust(right=0.75)
+    #fig.subplots_adjust(left=-0.65)
+    title = args.mooring + " SUNA " + args.serial_number
+    fig.suptitle(title)
+    fig.set_size_inches(12,6)
+    
+    par1 = host.twinx()
+    par2 = host.twinx()
+    par3 = host.twinx()
+    #par3 = host.twinx()
+    
+    par2.spines["right"].set_position(("axes", 1.1))
+    #par3.spines["right"].set_position(("axes", 1.3))
+    par3.spines["right"].set_position(('axes', 1.2))
+    #par3.spines["left"].set_position(("axes", 1.1))
+    #make_patch_spines_invisible(par2)
+    #par2.spines["right"].set_visible(True)
+
+    
+    p1, = host.plot(data[279], "blue", label="Fit RMSE")
+    p2, = par1.plot(data[4], "red", label="254nm Absorbance")
+    p3, = par2.plot(data[5], "orange", label="350nm Absorbance")
+    p4, = par3.plot(data[72], "green", label="Max Spectra")
+    
+    host.set_ylim(0, .005)
+    par1.set_ylim(-1, 1.0)
+    par2.set_ylim(-.5, 1.0)
+    
+    host.set_ylabel("RMSE")
+    par1.set_ylabel("Absorbance 254nm")
+    par2.set_ylabel("Absorbance 350nm")
+    par3.set_ylabel("Spectra counts")
+    
+    host.yaxis.label.set_color(p1.get_color())
+    par1.yaxis.label.set_color(p2.get_color())
+    par2.yaxis.label.set_color(p3.get_color())
+    par3.yaxis.label.set_color(p4.get_color())
+    
+    tkw = dict(size=4, width=1.5)
+    host.tick_params(axis='y', colors=p1.get_color(), **tkw)
+    par1.tick_params(axis='y', colors=p2.get_color(), **tkw)
+    par2.tick_params(axis='y', colors=p3.get_color(), **tkw)
+    par3.tick_params(axis='y', colors=p4.get_color(), **tkw)
+    host.tick_params(axis='x', **tkw)
+    
+    
+    lines = [p1, p2, p3, p4]
+
+    host.legend(lines, [l.get_label() for l in lines])
+    outfile = filename_prefix + "_analysis_plot.png"
+    plt.savefig(outfile)
+
+    
+    
         
 
 #make heatmap with seaborn
